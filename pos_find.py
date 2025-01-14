@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np
 
 # Path to your image folder
-folder_path = '/Users/hoangnamvu/Downloads/test/targets'
+folder_path = '/Users/hoangnamvu/Downloads/a/test/targets'
 
 # Initialize counters
 total_zeros = 0
