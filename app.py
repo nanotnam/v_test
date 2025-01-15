@@ -1,10 +1,7 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from celery import Celery
 import os
-from PIL import Image
-import numpy as np
-from io import BytesIO
 from celery_worker import run_inference
 
 
@@ -15,45 +12,55 @@ CORS(app)
 # Celery configuration
 app.config['CELERY_BROKER_URL'] = 'pyamqp://guest@localhost//'
 app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
-
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name)
 celery.conf.update(app.config)
 
-# Endpoint to receive image and start inference task
+
+# Endpoint nhận ảnh và cho vào model
 @app.route('/inference', methods=['POST'])
 def inference():
     if 'image' not in request.files:
-        return jsonify({"error": "No image provided"}), 400
+        return jsonify({"error": "anh chua duoc upload"}), 400
 
-    # Save image locally
+    # Lưu ảnh vào static
     image = request.files['image']
     image_path = os.path.join("static", image.filename)
     image.save(image_path)
 
-    # Start Celery task
+    # Bắt đầu cho ảnh vào model
     task = run_inference.delay(image_path)
+    
+    # tạo link kết quả
+    link = f"http://127.0.0.1:5000/result/{task.id}" #thay port neu can
 
-    return jsonify({"task_id": task.id}), 202
+    return render_template('result.html', link=link)
 
-# Endpoint to get inference result
+
+# Endpoint nhận kết quả
 @app.route('/result/<task_id>', methods=['GET'])
 def result(task_id):
     task = run_inference.AsyncResult(task_id)
 
     if task.state == 'PENDING':
-        response = {
-            "state": task.state,
-            "status": "Task is pending..."
-        }
+        # response = {
+        #     "state": task.state,
+        #     "status": "Chua xong, tai lai trang sau vai giay...  Processing, reload in a few seconds..."
+        # }
+        return render_template('phong_cho.html')
+
     elif task.state == 'SUCCESS':
-        result_path = task.result
-        return send_file(result_path, mimetype='image/png')
+        input_path, output_path = task.result
+        return render_template('display_images.html', input_image=input_path, output_image=output_path)
     else:
+
+        status = str(task.info)
         response = {
             "state": task.state,
-            "status": task.info.get('error', str(task.info))
+            "status": status
         }
     return jsonify(response)
 
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

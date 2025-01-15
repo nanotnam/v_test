@@ -6,7 +6,7 @@ from unet import UNetPlusPlus
 
 # Load model
 def load_model():
-    model_path = "model/model_epoch_21.pth"  # Đường dẫn tới file model
+    model_path = "model/model_epoch_40.pth"  # Đường dẫn tới file model
     device = torch.device('cpu')  # Chạy trên CPU
 
     # Khởi tạo mô hình
@@ -30,7 +30,7 @@ def predict(model, image_path):
     input_tensor = preprocess(image).unsqueeze(0)
 
     # Inference
-    with torch.no_grad():
+    with torch.inference_mode():
         output = model(input_tensor)
         mask = torch.sigmoid(output).squeeze().numpy()
         mask = (mask > 0.5).astype(np.uint8) * 255

@@ -1,0 +1,8 @@
+Flask
+Celery
+Flask-Cors
+Pillow
+torch
+torchvision
+numpy
+pika
