@@ -10,7 +10,7 @@ def load_model():
     device = torch.device('cpu')  # Chạy trên CPU
 
     # Khởi tạo mô hình
-    model = UNetPlusPlus(in_channels=3, num_classes=1)  # Thay đổi `in_channels` và `num_classes` nếu cần
+    model = UNetPlusPlus(in_channels=3, num_classes=1)  
 
     # Tải trọng số vào mô hình
     model.load_state_dict(torch.load(model_path, map_location=device))
