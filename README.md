@@ -2,7 +2,7 @@
 
 # Cài đặt
 
-Mở Docker (tải Rabbitmq qua docker)
+Mở Docker (để tải Rabbitmq qua docker)
 
 Vào terminal chạy
     virtualenv env
@@ -24,4 +24,4 @@ Vào terminal chạy
 
     python3 app.py
 
-    Dùng Live Server Extension trên Visual Studio Code để mở /templates/index.html
+    Dùng Live Server Extension trên Visual Studio Code để mở /templates/index.html trên web browser
